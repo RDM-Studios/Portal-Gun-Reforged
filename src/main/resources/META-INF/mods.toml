@@ -1,0 +1,104 @@
+modLoader="javafml" 
+loaderVersion="[36,)" 
+license="MIT License"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" 
+
+[[mods]] 
+modId="portalgun_reforged" 
+version="${file.jarVersion}" 
+displayName="Portal Gun Reforged" 
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" 
+logoFile="examplemod.png" 
+credits="MeowMC for the original mod, RDM Studios for the Forge port."
+authors="RDM Studios"
+description='''The unofficial Forge port of The Portal Gun Mod made by MeowMC'''
+
+# Base
+[[dependencies.portalgun_reforged]] 
+    modId="forge" 
+    mandatory=true 
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.portalgun_reforged]] 
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17)"
+    ordering="NONE"
+    side="BOTH"
+
+# Libraries
+[[dependencies.portalgun_reforged]]
+    modId="geckolib3"
+    mandatory=true
+    versionRange="[3.0.104,)"
+    ordering="NONE" 
+    side="BOTH"
+
+# Extras
+    # COMMON
+[[dependencies.portalgun_reforged]]
+    modId="projecte"
+    mandatory=false
+    versionRange="[PE1.0,]"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.portalgun_reforged]]
+    modId="jei"
+    mandatory=false
+    versionRange="[7.7.1.152,]"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.portalgun_reforged]]
+    modId="jeresources"
+    mandatory=false
+    versionRange="[0.12,]"
+    ordering="AFTER"
+    side="BOTH"
+	
+[[dependencies.portalgun_reforged]]
+    modId="jeed"
+    mandatory=false
+    versionRange="[1.16.5-1.6,]"
+    ordering="AFTER"
+    side="BOTH"
+	
+[[dependencies.portalgun_reforged]]
+    modId="theoneprobe"
+    mandatory=false
+    versionRange="[1.16-3.1.7,]"
+    ordering="AFTER"
+    side="BOTH"
+
+[[dependencies.portalgun_reforged]]
+    modId="jade"
+    mandatory=false
+    versionRange="[2.8.3,]"
+    ordering="AFTER"
+    side="BOTH"
+
+    # CLIENT
+[[dependencies.portalgun_reforged]]
+    modId="appleskin"
+    mandatory=false
+    versionRange="[mc1.16.5-2.4.0,]"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.portalgun_reforged]]
+    modId="configured"
+    mandatory=false
+    versionRange="[1.5.3,]"
+    ordering="AFTER"
+    side="CLIENT"
+
+[[dependencies.portalgun_reforged]]
+    modId="catalogue"
+    mandatory=false
+    versionRange="[1.6.1,]"
+    ordering="AFTER"
+    side="CLIENT"

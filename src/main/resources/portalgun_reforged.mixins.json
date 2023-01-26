@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "com.rdm.portalgun_reforged.mixins",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+	],
+	"client": [
+	],
+	"refmap": "portalgun_reforged.refmap.json",
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
