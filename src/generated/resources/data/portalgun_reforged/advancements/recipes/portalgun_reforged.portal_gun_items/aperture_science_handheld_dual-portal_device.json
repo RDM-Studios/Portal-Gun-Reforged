@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "portalgun_reforged:aperture_science_handheld_dual-portal_device"
+    ]
+  },
+  "criteria": {
+    "has_portal_device_body": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "portalgun_reforged:portal_device_body"
+          }
+        ]
+      }
+    },
+    "has_portal_device_claw": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "portalgun_reforged:portal_device_claw"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "portalgun_reforged:aperture_science_handheld_dual-portal_device"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_portal_device_body",
+      "has_portal_device_claw",
+      "has_the_recipe"
+    ]
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CB"
+  ],
+  "key": {
+    "B": {
+      "item": "portalgun_reforged:portal_device_body"
+    },
+    "C": {
+      "item": "portalgun_reforged:portal_device_claw"
+    }
+  },
+  "result": {
+    "item": "portalgun_reforged:aperture_science_handheld_dual-portal_device"
+  }
+}

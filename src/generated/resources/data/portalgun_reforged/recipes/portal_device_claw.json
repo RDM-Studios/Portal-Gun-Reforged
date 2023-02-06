@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SS ",
+    " DS",
+    "SSQ"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:stone"
+    },
+    "Q": {
+      "item": "minecraft:quartz_block"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "result": {
+    "item": "portalgun_reforged:portal_device_claw"
+  }
+}
