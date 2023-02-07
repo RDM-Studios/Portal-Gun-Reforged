@@ -20,7 +20,9 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 public class PortalGunItem extends AnimatableItem {
 	private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 	private AnimationController<PortalGunItem> mainController = new AnimationController<PortalGunItem>(this, getControllerName(), getTransitioningTicks(), this::mainPredicate);
-
+	private byte portalGunState = 0;
+	private Mode portalGunMode = Mode.NORMAL;
+	
 	public PortalGunItem(Properties pProperties) {
 		super(pProperties);
 	}
@@ -51,6 +53,22 @@ public class PortalGunItem extends AnimatableItem {
 		return 1;
 	}
 	
+	public byte getPortalGunState() {
+		return portalGunState;
+	}
+	
+	public void setPortalGunState(byte state) {
+		this.portalGunState = state;
+	}
+	
+	public Mode getPortalGunMode() {
+		return portalGunMode;
+	}
+	
+	public void setPortalGunMode(Mode mode) {
+		this.portalGunMode = mode;
+	}
+	
 	@Override
 	public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, PlayerEntity player) {
 		return true;
@@ -58,7 +76,7 @@ public class PortalGunItem extends AnimatableItem {
 	
 	@Override
 	public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -66,7 +84,28 @@ public class PortalGunItem extends AnimatableItem {
 		ItemStack portalGunStack = pPlayer.getMainHandItem();
 		
 		
+		
 		return ActionResult.pass(portalGunStack);
 	}
-
+	
+	public enum Mode {
+		NORMAL("normal", (byte) 0),
+		CARRY_ENTITY("carry_entity", (byte) 0);
+		
+		private final String name;
+		private byte state;
+		
+		Mode(String name, byte state) {
+			this.name = name;
+			this.state = state;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public byte getState() {
+			return state;
+		}
+	}
 }

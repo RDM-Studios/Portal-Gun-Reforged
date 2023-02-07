@@ -13,7 +13,9 @@ public class PGRSoundEvents {
 	public static final RegistryObject<SoundEvent> PORTAL_CLOSE_1 = registerSoundEvent("entity.portal.close_1", "entity.portal.close_1");
 	public static final RegistryObject<SoundEvent> PORTAL_CLOSE_2 = registerSoundEvent("entity.portal.close_2", "entity.portal.close_2");
 	
-	public static final RegistryObject<SoundEvent> PORTAL_OPEN = registerSoundEvent("entity.portal.open", "entity.portal.open");
+	public static final RegistryObject<SoundEvent> PORTAL_OPEN_1 = registerSoundEvent("entity.portal.open_1", "entity.portal.open_1");
+	public static final RegistryObject<SoundEvent> PORTAL_OPEN_2 = registerSoundEvent("entity.portal.open_2", "entity.portal.open_2");
+	public static final RegistryObject<SoundEvent> PORTAL_OPEN_3 = registerSoundEvent("entity.portal.open_3", "entity.portal.open_3");
 	
 	public static final RegistryObject<SoundEvent> PORTAL_SHOOT_1 = registerSoundEvent("entity.portal.shoot_1", "entity.portal.shoot_1");
 	public static final RegistryObject<SoundEvent> PORTAL_SHOOT_2 = registerSoundEvent("entity.portal.shoot_2", "entity.portal.shoot_2");

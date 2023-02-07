@@ -2,5 +2,8 @@
   "item.portalgun_reforged.aperture_science_handheld_dual-portal_device": "Aperture Science Handheld Dual-Portal Device",
   "item.portalgun_reforged.portal_device_body": "Portal Device Body",
   "item.portalgun_reforged.portal_device_claw": "Portal Device Claw",
-  "itemGroup.portalgun_reforged.portal_gun_items": "Portal Gun Items"
+  "itemGroup.portalgun_reforged.portal_gun_items": "Portal Gun Items",
+  "key.category.portalgun_reforged": "Portal Gun Reforged",
+  "key.portalgun_reforged.remove_old_portals": "Remove Old Portals",
+  "key.portalgun_reforged.switch_portal_gun_mode": "Switch Portal Gun Mode"
 }

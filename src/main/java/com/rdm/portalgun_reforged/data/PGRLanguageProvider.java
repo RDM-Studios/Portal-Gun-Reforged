@@ -1,6 +1,8 @@
 package com.rdm.portalgun_reforged.data;
 
 import static com.rdm.portalgun_reforged.common.registries.PGRItemGroups.PGR_ITEMS;
+import static com.rdm.portalgun_reforged.common.registries.PGRKeyBindings.REMOVE_OLD_PORTALS;
+import static com.rdm.portalgun_reforged.common.registries.PGRKeyBindings.SWITCH_PORTAL_GUN_MODE;
 
 import java.util.List;
 
@@ -8,6 +10,7 @@ import com.rdm.portalgun_reforged.PortalGunReforged;
 import com.rdm.portalgun_reforged.common.registries.PGRItems;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -73,11 +76,11 @@ public class PGRLanguageProvider extends LanguageProvider {
 		}
 		
 		for (ItemGroup tab : pgrItemGroups) {
-			String registryName = tab.getDisplayName().toString();
-			int endCharIndex = registryName.indexOf("',");
-			registryName = registryName.substring(27, endCharIndex);
+			String regName = tab.getDisplayName().toString();
+			int endCharIndex = regName.indexOf("',");
+			regName = regName.substring(27, endCharIndex);
 			
-			localizeGeneralRegistryNames(registryName);
+			localizeGeneralRegistryNames(regName);
 		}
 	}
 	
@@ -89,11 +92,29 @@ public class PGRLanguageProvider extends LanguageProvider {
 			localizeGeneralRegistryNames(regName);
 		}
 	}
+	
+	private void translateKeyBindings() {
+		ObjectArrayList<KeyBinding> pgrKeyBindings = new ObjectArrayList<KeyBinding>(1);
+		
+		// Lazy 100 part 2 (real)
+		if (pgrKeyBindings.isEmpty()) {
+			pgrKeyBindings.addAll(List.of(REMOVE_OLD_PORTALS, SWITCH_PORTAL_GUN_MODE));
+		}
+		
+		for (KeyBinding keyBinding : pgrKeyBindings) {
+			String regName = keyBinding.getName();
+			
+			localizeGeneralRegistryNames(regName);
+		}
+		
+		add("key.category.portalgun_reforged", "Portal Gun Reforged");
+	}
 
 	@Override
 	protected void addTranslations() {
 		translateItemGroups();
 		translateItems();
+		translateKeyBindings();
 	}
 
 }

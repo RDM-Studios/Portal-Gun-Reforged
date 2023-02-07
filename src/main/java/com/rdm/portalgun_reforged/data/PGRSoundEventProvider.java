@@ -28,8 +28,7 @@ public class PGRSoundEventProvider extends SoundEventProvider {
 			openSoundVariants.addAll(List.of(PortalGunReforged.prefixRL("entity/portal/open_1"), PortalGunReforged.prefixRL("entity/portal/open_2"), PortalGunReforged.prefixRL("entity/portal/open_3")));
 		}
 		
-		createSoundEvent(sounds)
-				.addExtraSoundVariantFor(PGRSoundEvents.PORTAL_OPEN.get(), openSoundVariants);
+		createSoundEvent(sounds);
 	}
 	
 }

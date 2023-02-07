@@ -11,11 +11,22 @@
       "portalgun_reforged:entity/portal/close_2"
     ]
   },
-  "entity.portal.open": {
-    "subtitle": "subtitle.portalgun_reforged.entity.portal.open",
+  "entity.portal.open_1": {
+    "subtitle": "subtitle.portalgun_reforged.entity.portal.open_1",
     "sounds": [
-      "portalgun_reforged:entity/portal/open",
-      "entity/portal/open_3"
+      "portalgun_reforged:entity/portal/open_1"
+    ]
+  },
+  "entity.portal.open_2": {
+    "subtitle": "subtitle.portalgun_reforged.entity.portal.open_2",
+    "sounds": [
+      "portalgun_reforged:entity/portal/open_2"
+    ]
+  },
+  "entity.portal.open_3": {
+    "subtitle": "subtitle.portalgun_reforged.entity.portal.open_3",
+    "sounds": [
+      "portalgun_reforged:entity/portal/open_3"
     ]
   },
   "entity.portal.shoot_1": {
