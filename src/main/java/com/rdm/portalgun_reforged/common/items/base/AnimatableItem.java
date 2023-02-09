@@ -16,7 +16,7 @@ public abstract class AnimatableItem extends Item implements IAnimatable {
 	@Override
 	abstract public void registerControllers(AnimationData data);
 	
-	abstract public <E extends IAnimatable> PlayState mainPredicate(AnimationEvent<E> event);
+	abstract public <E extends Item & IAnimatable> PlayState mainPredicate(AnimationEvent<E> event);
 
 	@Override
 	abstract public AnimationFactory getFactory();

@@ -2,6 +2,7 @@ package com.rdm.portalgun_reforged.common.items;
 
 import com.rdm.portalgun_reforged.common.items.base.AnimatableItem;
 
+import net.minecraft.item.Item;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -29,7 +30,7 @@ public class PortalGunClawItem extends AnimatableItem {
 	}
 
 	@Override
-	public <E extends IAnimatable> PlayState mainPredicate(AnimationEvent<E> event) {
+	public <E extends Item & IAnimatable> PlayState mainPredicate(AnimationEvent<E> event) {
 		return PlayState.CONTINUE;
 	}
 
