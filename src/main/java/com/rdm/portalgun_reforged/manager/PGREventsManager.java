@@ -1,6 +1,7 @@
 package com.rdm.portalgun_reforged.manager;
 
 import com.rdm.portalgun_reforged.PortalGunReforged;
+import com.rdm.portalgun_reforged.client.events.PGRClientMiscEvents;
 import com.rdm.portalgun_reforged.client.events.PGRClientSetupEvents;
 import com.rdm.portalgun_reforged.common.events.PGRCommonSetupEvents;
 
@@ -16,9 +17,10 @@ public class PGREventsManager {
 	
 	private static void registerClientEvents(IEventBus modBus, IEventBus forgeBus) {
 		// Setup
-		modBus.addListener(PGRClientSetupEvents::onFMLClientSetupEvent);
+		modBus.addListener(PGRClientSetupEvents::onFMLClientSetup);
 		
 		// Misc
+		forgeBus.addListener(PGRClientMiscEvents::onInput);
 	}
 	
 	private static void registerCommonEvents(IEventBus modBus, IEventBus forgeBus) {

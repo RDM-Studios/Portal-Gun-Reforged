@@ -7,7 +7,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class PGRClientSetupEvents {
 	
-	public static void onFMLClientSetupEvent(final FMLClientSetupEvent event) {
+	public static void onFMLClientSetup(final FMLClientSetupEvent event) {
 		//Register custom keybinds
 		ClientRegistry.registerKeyBinding(PGRKeyBindings.REMOVE_OLD_PORTALS);
 		ClientRegistry.registerKeyBinding(PGRKeyBindings.SWITCH_PORTAL_GUN_MODE);
