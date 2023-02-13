@@ -11,6 +11,7 @@ public class PGRegistryManager {
 		PGREntityTypes.PGR_ENTITY_TYPES.register(PortalGunReforged.MOD_BUS);
 		PGRItems.PGR_ITEMS.register(PortalGunReforged.MOD_BUS);
 		PGRSoundEvents.PGR_SOUND_EVENTS.register(PortalGunReforged.MOD_BUS);
+		PortalGunReforged.LOGGER.debug("Registered registries!");
 	}
 
 }

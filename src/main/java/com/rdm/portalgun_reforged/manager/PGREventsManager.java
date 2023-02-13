@@ -5,6 +5,7 @@ import com.rdm.portalgun_reforged.client.events.PGRClientMiscEvents;
 import com.rdm.portalgun_reforged.client.events.PGRClientSetupEvents;
 import com.rdm.portalgun_reforged.common.events.PGRCommonSetupEvents;
 
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 public class PGREventsManager {
@@ -13,6 +14,7 @@ public class PGREventsManager {
 		registerClientEvents(PortalGunReforged.MOD_BUS, PortalGunReforged.FORGE_BUS);
 		registerCommonEvents(PortalGunReforged.MOD_BUS, PortalGunReforged.FORGE_BUS);
 		PortalGunReforged.FORGE_BUS.register(PortalGunReforged.INSTANCE);
+		PortalGunReforged.LOGGER.debug("Registered events!");
 	}
 	
 	private static void registerClientEvents(IEventBus modBus, IEventBus forgeBus) {
@@ -20,7 +22,7 @@ public class PGREventsManager {
 		modBus.addListener(PGRClientSetupEvents::onFMLClientSetup);
 		
 		// Misc
-		forgeBus.addListener(PGRClientMiscEvents::onInput);
+		forgeBus.addListener(EventPriority.HIGHEST, PGRClientMiscEvents::onInput);
 	}
 	
 	private static void registerCommonEvents(IEventBus modBus, IEventBus forgeBus) {

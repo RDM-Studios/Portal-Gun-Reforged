@@ -19,6 +19,7 @@ public class PGRNetworkManager {
 		int id = 0;
 		registerCTSPackets(id);
 		registerSTCPackets(id);
+		PortalGunReforged.LOGGER.debug("Registered packets!");
 	}
 	
 	private static void registerCTSPackets(int id) {
