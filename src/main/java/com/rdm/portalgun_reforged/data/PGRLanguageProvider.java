@@ -7,11 +7,13 @@ import static com.rdm.portalgun_reforged.common.registries.PGRKeyBindings.SWITCH
 import java.util.List;
 
 import com.rdm.portalgun_reforged.PortalGunReforged;
+import com.rdm.portalgun_reforged.common.registries.PGREntityTypes;
 import com.rdm.portalgun_reforged.common.registries.PGRItems;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraftforge.common.data.LanguageProvider;
@@ -67,6 +69,15 @@ public class PGRLanguageProvider extends LanguageProvider {
 		add(registryName, regName);
 	}
 	
+	private void translateEntities() {
+		for (RegistryObject<EntityType<?>> entityGenEntry : PGREntityTypes.PGR_ENTITY_TYPES.getEntries()) {
+			EntityType<?> entityType = entityGenEntry.get();
+			String regName = entityType.getDescriptionId();
+			
+			formatString(regName);
+		}
+	}
+	
 	private void translateItemGroups() {
 		ObjectArrayList<ItemGroup> pgrItemGroups = new ObjectArrayList<ItemGroup>(1);
 		
@@ -112,6 +123,7 @@ public class PGRLanguageProvider extends LanguageProvider {
 
 	@Override
 	protected void addTranslations() {
+		translateEntities();
 		translateItemGroups();
 		translateItems();
 		translateKeyBindings();

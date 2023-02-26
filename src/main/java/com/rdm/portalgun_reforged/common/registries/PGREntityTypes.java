@@ -1,7 +1,8 @@
 package com.rdm.portalgun_reforged.common.registries;
 
 import com.rdm.portalgun_reforged.PortalGunReforged;
-import com.rdm.portalgun_reforged.common.entities.PortalEntity;
+import com.rdm.portalgun_reforged.common.entities.BluePortalEntity;
+import com.rdm.portalgun_reforged.common.entities.OrangePortalEntity;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -13,7 +14,25 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class PGREntityTypes {
 	public static final DeferredRegister<EntityType<?>> PGR_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES, PortalGunReforged.MODID);
 	
-	public static final RegistryObject<EntityType<?>> PORTAL = registerMiscEntity("portal", PortalEntity::new, 0.6F, 1.8F);
+	public static final RegistryObject<EntityType<BluePortalEntity>> BLUE_PORTAL = registerBluePortalEntity("blue_portal", BluePortalEntity::new, 0.6F, 1.8F);
+	public static final RegistryObject<EntityType<OrangePortalEntity>> ORANGE_PORTAL = registerOrangePortalEntity("orange_portal", OrangePortalEntity::new, 0.6F, 1.8F);
+	
+	//TODO Temp 
+	@SuppressWarnings("unchecked")
+	private static RegistryObject<EntityType<BluePortalEntity>> registerBluePortalEntity(String regName, IFactory<?> entityConsumer, float width, float height) {
+		RegistryObject<?> entityRegObj = PGR_ENTITY_TYPES.register(regName, () -> EntityType.Builder.of(entityConsumer, EntityClassification.MISC)
+				.sized(width, height)
+				.build(PortalGunReforged.prefixRL(regName).toString()));		
+		return (RegistryObject<EntityType<BluePortalEntity>>) entityRegObj;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static RegistryObject<EntityType<OrangePortalEntity>> registerOrangePortalEntity(String regName, IFactory<?> entityConsumer, float width, float height) {
+		RegistryObject<?> entityRegObj = PGR_ENTITY_TYPES.register(regName, () -> EntityType.Builder.of(entityConsumer, EntityClassification.MISC)
+				.sized(width, height)
+				.build(PortalGunReforged.prefixRL(regName).toString()));		
+		return (RegistryObject<EntityType<OrangePortalEntity>>) entityRegObj;
+	}
 	
 	private static RegistryObject<EntityType<?>> registerAmbientEntity(String regName, IFactory<?> entityConsumer, float size) {
 		RegistryObject<EntityType<?>> entityRegObj = PGR_ENTITY_TYPES.register(regName, () -> EntityType.Builder.of(entityConsumer, EntityClassification.AMBIENT)

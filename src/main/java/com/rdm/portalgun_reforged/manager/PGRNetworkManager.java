@@ -1,6 +1,8 @@
 package com.rdm.portalgun_reforged.manager;
 
 import com.rdm.portalgun_reforged.PortalGunReforged;
+import com.rdm.portalgun_reforged.common.network.packet.EntityPositionUpdatePacket;
+import com.rdm.portalgun_reforged.common.network.packet.PortalGunModeResetPacket;
 import com.rdm.portalgun_reforged.common.network.packet.PortalGunSwitchModePacket;
 
 import net.minecraft.client.Minecraft;
@@ -27,6 +29,16 @@ public class PGRNetworkManager {
 			.decoder(PortalGunSwitchModePacket::decode)
 		    .encoder(PortalGunSwitchModePacket::encode)
 		    .consumer(PortalGunSwitchModePacket::handlePacket)
+			.add();
+		CHANNEL.messageBuilder(PortalGunModeResetPacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+			.decoder(PortalGunModeResetPacket::decode)
+			.encoder(PortalGunModeResetPacket::encode)
+			.consumer(PortalGunModeResetPacket::handlePacket)
+			.add();
+		CHANNEL.messageBuilder(EntityPositionUpdatePacket.class, id++, NetworkDirection.PLAY_TO_SERVER)
+			.decoder(EntityPositionUpdatePacket::decode)
+			.encoder(EntityPositionUpdatePacket::encode)
+			.consumer(EntityPositionUpdatePacket::handlePacket)
 			.add();
 	}
 	

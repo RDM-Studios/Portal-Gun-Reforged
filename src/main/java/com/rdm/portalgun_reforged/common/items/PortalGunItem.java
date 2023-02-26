@@ -2,13 +2,21 @@ package com.rdm.portalgun_reforged.common.items;
 
 import java.util.List;
 
-import com.rdm.portalgun_reforged.common.entities.PortalEntity;
+import javax.annotation.Nullable;
+
+import com.rdm.portalgun_reforged.PortalGunReforged;
+import com.rdm.portalgun_reforged.common.config.PGRCommonConfig;
+import com.rdm.portalgun_reforged.common.entities.BluePortalEntity;
+import com.rdm.portalgun_reforged.common.entities.OrangePortalEntity;
 import com.rdm.portalgun_reforged.common.items.base.AnimatableSyncableItem;
-import com.rdm.portalgun_reforged.common.registries.PGREntityTypes;
-import com.rdm.portalgun_reforged.common.registries.PGRSoundEvents;
+import com.rdm.portalgun_reforged.common.network.packet.EntityPositionUpdatePacket;
+import com.rdm.portalgun_reforged.manager.PGRNetworkManager;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileHelper;
@@ -21,7 +29,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.EntityRayTraceResult;
@@ -50,8 +57,10 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 	private AnimationController<PortalGunItem> mainController = new AnimationController<PortalGunItem>(this, getControllerName(), getTransitioningTicks(), this::mainPredicate);
 	private Mode portalGunMode = Mode.NORMAL;
-	private final CompoundNBT portalGunModeNBT = getDefaultInstance().getOrCreateTag();
+	private final CompoundNBT portalGunModeNBT = new CompoundNBT();
 	private final ObjectArrayList<LivingEntity> liftedEntities = new ObjectArrayList<LivingEntity>();
+	private BluePortalEntity bluePortal;
+	private OrangePortalEntity orangePortal;
 
 	public PortalGunItem(Properties pProperties) {
 		super(pProperties);
@@ -105,6 +114,20 @@ public class PortalGunItem extends AnimatableSyncableItem {
 		}
 	}
 
+	public CompoundNBT getModeNBT() {
+		return portalGunModeNBT;
+	}
+
+	@Nullable
+	public BluePortalEntity getFirstPortal() {
+		return null;
+	}
+
+	@Nullable
+	public BluePortalEntity getSecondPortal() {
+		return null;
+	}
+
 	public byte getPortalGunState() {
 		return portalGunMode.getState();
 	}
@@ -112,7 +135,7 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	public void setPortalGunState(byte state) {
 		portalGunMode.setState(state);
 	}
-	
+
 	public void resetPortalGunState() {
 		portalGunMode.setState((byte) 0);
 	}
@@ -124,7 +147,7 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	public void setPortalGunMode(Mode mode) {
 		this.portalGunMode = mode;
 	}
-	
+
 	public void resetPortalGunMode() {
 		this.portalGunMode = Mode.NORMAL;
 	}
@@ -132,11 +155,15 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	public void switchMode() {
 		setPortalGunMode(getPortalGunMode().equals(Mode.NORMAL) ? Mode.CARRY_ENTITY : Mode.NORMAL); 
 	}
-	
+
+	public RemovalMode getPortalGunEntityRemovalMode() {
+		return PGRCommonConfig.COMMON.entityRemovalMode.get();
+	}
+
 	public ObjectArrayList<LivingEntity> getLiftedEntities() {
 		return liftedEntities;
 	}
-	
+
 	public int getAmountOfLiftedEntities() {
 		return liftedEntities.size();
 	}
@@ -147,32 +174,50 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	}
 
 	@Override
+	public boolean canAttackBlock(BlockState pState, World pLevel, BlockPos pPos, PlayerEntity pPlayer) {
+		return false;
+	}
+
+	@Override
+	public boolean hurtEnemy(ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
+		return false;
+	}
+
+	public void resetPortals() {
+		setPortalGunState((byte) 0);
+	}
+
+	@Override
 	public boolean onEntitySwing(ItemStack portalGunStack, LivingEntity owner) {
-		playSyncableAnimation(owner, Hand.MAIN_HAND);
-		owner.level.playSound((PlayerEntity) null, owner.blockPosition(), PGRSoundEvents.PORTAL_SHOOT_1.get(), SoundCategory.PLAYERS, 1.0F, 1.0F);
-		if (owner instanceof PlayerEntity) ((PlayerEntity) owner).getCooldowns().addCooldown(this, 4);
+		if (getPortalGunMode().equals(Mode.NORMAL)) {
+			
+			if (owner instanceof PlayerEntity) ((PlayerEntity) owner).getCooldowns().addCooldown(this, 4);			
+		} else if (getPortalGunMode().equals(Mode.CARRY_ENTITY)) {
+			if (owner instanceof PlayerEntity) {
+				if (handleRemoveLiftedEntities(portalGunStack, (PlayerEntity) owner)) {
+					playSyncableAnimation((PlayerEntity) owner, Hand.MAIN_HAND);
+					return true;
+				}
+			}
+		}
 		return true;
 	}
-	
+
 	@Override
 	public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
-		return ActionResultType.PASS;
+		return ActionResultType.FAIL;
 	}
 
 	@Override
 	public ActionResult<ItemStack> use(World pLevel, PlayerEntity pPlayer, Hand pHand) {
 		ItemStack portalGunStack = pPlayer.getMainHandItem();
 
-		if (getPortalGunMode().equals(Mode.NORMAL) && !portalGunModeNBT.contains("secondPortalUUID")) {
-	//		setPortalGunState((byte) 2);
-			playSyncableAnimation(pPlayer, pHand);
-			PortalEntity portal = (PortalEntity) PGREntityTypes.PORTAL.get().create(pLevel);
-	//		portalGunModeNBT.putUUID("secondPortalUUID", portal.getUUID());
-			pLevel.playSound(pPlayer, pPlayer.blockPosition(), PGRSoundEvents.PORTAL_SHOOT_2.get(), SoundCategory.PLAYERS, 1.0F, 1.0F);
-			
-		} else if (getPortalGunMode().equals(Mode.CARRY_ENTITY)) handleLiftingEntities(portalGunStack, pPlayer);
-		
-//		portalGunStack.setTag(portalGunModeNBT);
+		if (getPortalGunMode().equals(Mode.NORMAL)) {
+
+		} else if (getPortalGunMode().equals(Mode.CARRY_ENTITY)) {
+			handleAddLiftingEntities(portalGunStack, pPlayer);
+		}
+
 		pPlayer.getCooldowns().addCooldown(this, 4);
 		pPlayer.awardStat(Stats.ITEM_USED.get(this));
 		return ActionResult.pass(portalGunStack);
@@ -195,16 +240,16 @@ public class PortalGunItem extends AnimatableSyncableItem {
 	public void removePortals() {
 
 	}
-	
-	private boolean handleLiftingEntities(ItemStack portalGunStack, PlayerEntity pPlayer) {
+
+	private boolean handleAddLiftingEntities(ItemStack portalGunStack, PlayerEntity pPlayer) {
 		double validReach = (pPlayer.getAttributeBaseValue(ForgeMod.REACH_DISTANCE.get()) * pPlayer.getAttributeBaseValue(ForgeMod.REACH_DISTANCE.get())) * 2;
 
 		Vector3d viewVec = pPlayer.getViewVector(1.0F);
 		Vector3d eyeVec = pPlayer.getEyePosition(1.0F);
 		Vector3d targetVec = eyeVec.add(viewVec.x * validReach, viewVec.y * validReach, viewVec.z * validReach);
 
-		AxisAlignedBB bb = pPlayer.getBoundingBox().expandTowards(viewVec.scale(validReach)).inflate(4.0D, 4.0D, 4.0D);
-		EntityRayTraceResult result = ProjectileHelper.getEntityHitResult(pPlayer.level, pPlayer, eyeVec, targetVec, bb, EntityPredicates.NO_CREATIVE_OR_SPECTATOR);
+		AxisAlignedBB targetBB = pPlayer.getBoundingBox().expandTowards(viewVec.scale(validReach)).inflate(4.0D, 4.0D, 4.0D);
+		EntityRayTraceResult result = ProjectileHelper.getEntityHitResult(pPlayer.level, pPlayer, eyeVec, targetVec, targetBB, EntityPredicates.NO_CREATIVE_OR_SPECTATOR);
 
 		if (result == null || !(result.getEntity() instanceof LivingEntity) || result.getType() != RayTraceResult.Type.ENTITY) return false;
 
@@ -213,18 +258,133 @@ public class PortalGunItem extends AnimatableSyncableItem {
 		double distanceToTargetSqr = pPlayer.distanceToSqr(target);
 
 		boolean isValidResult = (result != null ? target : null) != null && result.getType() == RayTraceResult.Type.ENTITY;
+		if (!canLiftEntity(target)) return false;
 
 		if (isValidResult) {
 			if (validReach >= distanceToTargetSqr) {
 				if (getAmountOfLiftedEntities() > 1) setPortalGunState((byte) 2);
 				else setPortalGunState((byte) 1);
-				if (!liftedEntities.contains(target)) liftedEntities.add(target);
-				portalGunModeNBT.putUUID("targetEntityLifted" + liftedEntities.indexOf(target), target.getUUID());
-				portalGunModeNBT.putInt("liftedEntitiesAmount", getAmountOfLiftedEntities());
+				if (!liftedEntities.contains(target) && getAmountOfLiftedEntities() < 10) {
+					liftedEntities.add(target);
+
+					portalGunModeNBT.putUUID("targetEntityLifted" + liftedEntities.indexOf(target), target.getUUID());
+					portalGunModeNBT.putInt("liftedEntitiesAmount", getAmountOfLiftedEntities());
+
+					PortalGunReforged.LOGGER.debug("[MOVED ENTITIES AMOUNT]: " + getAmountOfLiftedEntities());
+				}
 			}
 		}
-		
+
+		// Extra check
+		if (liftedEntities.isEmpty() || getPortalGunMode() != Mode.CARRY_ENTITY || pPlayer.getMainHandItem() != portalGunStack) setPortalGunState((byte) 0);
 		return true;
+	}
+
+	private boolean handleRemoveLiftedEntities(ItemStack portalGunStack, PlayerEntity pPlayer) {
+		if (getPortalGunEntityRemovalMode().equals(RemovalMode.CONSECUTIVE)) {
+			if (portalGunStack == null) return false;
+			if (!liftedEntities.isEmpty()) {
+				LivingEntity target = liftedEntities.get(liftedEntities.size() - 1);
+
+				if (target == null) return false;
+
+				PGRNetworkManager.sendPacketToServer(new EntityPositionUpdatePacket(target.getId(), target.blockPosition()));
+				portalGunModeNBT.remove("targetEntityLifted" + liftedEntities.indexOf(target));
+				liftedEntities.remove(liftedEntities.size() - 1);
+				PortalGunReforged.LOGGER.debug("[MOVED ENTITIES AMOUNT]: " + getAmountOfLiftedEntities());
+			}
+		} else if (getPortalGunEntityRemovalMode().equals(RemovalMode.POINT_AT)) {
+			double validReach = (pPlayer.getAttributeBaseValue(ForgeMod.REACH_DISTANCE.get()) * pPlayer.getAttributeBaseValue(ForgeMod.REACH_DISTANCE.get())) * 2;
+
+			Vector3d viewVec = pPlayer.getViewVector(1.0F);
+			Vector3d eyeVec = pPlayer.getEyePosition(1.0F);
+			Vector3d targetVec = eyeVec.add(viewVec.x * validReach, viewVec.y * validReach, viewVec.z * validReach);
+
+			AxisAlignedBB targetBB = pPlayer.getBoundingBox().expandTowards(viewVec.scale(validReach)).inflate(4.0D, 4.0D, 4.0D);
+			EntityRayTraceResult result = ProjectileHelper.getEntityHitResult(pPlayer.level, pPlayer, eyeVec, targetVec, targetBB, EntityPredicates.NO_CREATIVE_OR_SPECTATOR);
+
+			if (result == null || !(result.getEntity() instanceof LivingEntity) || result.getType() != RayTraceResult.Type.ENTITY) return false;
+
+			LivingEntity target = (LivingEntity) result.getEntity();
+
+			boolean isValidResult = (result != null ? target : null) != null && result.getType() == RayTraceResult.Type.ENTITY;
+			if (!liftedEntities.contains(target)) return false;
+
+			if (isValidResult) {
+				liftedEntities.remove(target);
+				PGRNetworkManager.sendPacketToServer(new EntityPositionUpdatePacket(target.getId(), target.blockPosition()));
+				PortalGunReforged.LOGGER.debug("[MOVED ENTITIES AMOUNT]: " + getAmountOfLiftedEntities());
+			}
+		}
+		// Account for extra cases
+		if (!liftedEntities.isEmpty()) {			
+			for (int i = 0; i < liftedEntities.size() -1; i++) {
+				LivingEntity target = liftedEntities.get(i);
+
+				if (target.isDeadOrDying() || target == null || !target.isAlive()) {
+					PGRNetworkManager.sendPacketToServer(new EntityPositionUpdatePacket(target.getId(), target.blockPosition()));
+					if (portalGunModeNBT.contains("targetEntityLifted" + liftedEntities.indexOf(target))) portalGunModeNBT.remove("targetEntityLifted" + liftedEntities.indexOf(target));
+					liftedEntities.remove(i);
+				}
+			}
+		}
+		if (liftedEntities.isEmpty()) setPortalGunState((byte) 0);
+		return true;
+	}
+
+	private boolean canLiftEntity(LivingEntity target) {
+		boolean sizeCheck = target.getBbWidth() < 3.0F || target.getBbHeight() < 4.125F;
+		return sizeCheck;
+	}
+
+	@Override
+	public void inventoryTick(ItemStack pStack, World pLevel, Entity pEntity, int pItemSlot, boolean pIsSelected) {
+		super.inventoryTick(pStack, pLevel, pEntity, pItemSlot, pIsSelected);
+
+		if (pEntity.tickCount % 20 == 0) {
+			PortalGunReforged.LOGGER.debug("+-----------------------------------------------+");
+			PortalGunReforged.LOGGER.debug("[MODE]: " + getPortalGunMode());
+			PortalGunReforged.LOGGER.debug("[STATE]: " + getPortalGunState());
+			PortalGunReforged.LOGGER.debug("+-----------------------------------------------+");
+		}
+
+		if (pEntity instanceof PlayerEntity) {
+			PlayerEntity owner = (PlayerEntity) pEntity;
+
+			if (owner.getMainHandItem() != pStack || !(owner.getMainHandItem().getItem() instanceof PortalGunItem) || !owner.inventory.contains(pStack) || !owner.isAlive() || owner.isSpectator() || getPortalGunMode() != Mode.CARRY_ENTITY) {
+				setPortalGunState((byte) 0);
+				if (!liftedEntities.isEmpty()) {
+					for (LivingEntity target : liftedEntities) {
+						PGRNetworkManager.sendPacketToServer(new EntityPositionUpdatePacket(target.getId(), target.blockPosition()));
+					}
+					liftedEntities.clear();
+				}
+			}
+
+			if (owner.getMainHandItem() == pStack) {
+				if (!liftedEntities.isEmpty()) {
+					RayTraceResult targetRayTraceResult = Minecraft.getInstance().getCameraEntity().pick(10.0F, 0.0F, false);
+					Vector3d resultPos = targetRayTraceResult.getLocation();
+					BlockPos targetBlockPos = new BlockPos(resultPos.x, resultPos.y, resultPos.z);
+
+					for (LivingEntity t : liftedEntities) {
+						if (t != null) {
+							PGRNetworkManager.sendPacketToServer(new EntityPositionUpdatePacket(t.getId(), targetBlockPos));
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	private void removeAllPortals() {
+		if (portalGunModeNBT.contains("firstPortalUUID")) portalGunModeNBT.remove("firstPortalUUID");
+		if (portalGunModeNBT.contains("secondPortalUUID")) portalGunModeNBT.remove("secondPortalUUID");
+	}
+
+	public void moveToUntil(LivingEntity target, double x, double y, double z, boolean condition) {
+		if (!condition) target.moveTo(x, y, z);
 	}
 
 	public enum Mode {
@@ -249,6 +409,21 @@ public class PortalGunItem extends AnimatableSyncableItem {
 
 		public void setState(byte state) {
 			this.state = state;
+		}
+	}
+
+	public enum RemovalMode {
+		CONSECUTIVE("Consecutively remove entities in the order they were picked up in."),
+		POINT_AT("Remove entities directly within the line of sight of the portal gun user.");
+
+		private final String description;
+
+		RemovalMode(String description) {
+			this.description = description;
+		}
+
+		public String getDescription() {
+			return description;
 		}
 	}
 }
